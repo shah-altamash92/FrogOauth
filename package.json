@@ -1,7 +1,7 @@
 {
-  "name": "react-native-frog-oauth",
+  "name": "react-native-frog-load",
   "version": "1.0.0",
-  "description": "React Native Frog OAuth",
+  "description": "React Native Frog Loader",
   "main": "index.js",
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"
@@ -12,23 +12,12 @@
   },
   "keywords": [
     "Frog",
-    "OAuth"
+    "Loader"
   ],
   "author": "Frog",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/shah-altamash92/FrogOauth/issues"
   },
-  "homepage": "https://github.com/shah-altamash92/FrogOauth#readme",
-   "dependencies": {
-    "oauth-1.0a": "^2.2.4",
-    "oauth-signature": "^1.5.0",
-  },
-  "devDependencies": {
-    "babel-jest": "23.6.0",
-    "jest": "23.6.0",
-    "metro-react-native-babel-preset": "0.48.1",
-    "react-test-renderer": "16.6.0-alpha.8af6728"
-  },
+  "homepage": "https://github.com/shah-altamash92/FrogOauth#readme"
 }
-
