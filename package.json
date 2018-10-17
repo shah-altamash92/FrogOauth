@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/shah-altamash92/FrogOauth/issues"
   },
-  "homepage": "https://github.com/shah-altamash92/FrogOauth#readme"
+  "homepage": "https://github.com/shah-altamash92/FrogOauth#readme",
+   "dependencies": {
+    "react-native-indicators": "^0.13.0"
+  }
 }
