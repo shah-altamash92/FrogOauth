@@ -1,8 +1,8 @@
 {
   "name": "react-native-frog-oauth”,
-  "version": "0.0.1",
-  "private": true,
-  "main": “oauth.js",
+  "version": “1.0.0”,
+ "description": "React Native Frog oauth”,
+  "main": “index.js",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
@@ -21,12 +21,6 @@
   "dependencies": {
     "oauth-1.0a": "^2.2.4",
     "oauth-signature": "^1.5.0",
-    "react": "16.6.0-alpha.8af6728",
-    "react-native": "0.57.3"
-  },
-
-  "jest": {
-    "preset": "react-native"
   },
   "bugs": {
     "url": "https://github.com/RSysNoida/FrogLoader/issues"
