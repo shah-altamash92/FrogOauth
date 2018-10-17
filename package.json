@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/shah-altamash92/FrogOauth#readme",
    "dependencies": {
-    "react-native-indicators": "^0.13.0"
+    "react-native-indicators": "^0.13.0",
+     "oauth-1.0a": "^2.2.4",
+    "oauth-signature": "^1.5.0",
   }
 }
