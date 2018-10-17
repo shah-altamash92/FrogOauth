@@ -23,6 +23,12 @@
    "dependencies": {
     "oauth-1.0a": "^2.2.4",
     "oauth-signature": "^1.5.0",
-  }
+  },
+  "devDependencies": {
+    "babel-jest": "23.6.0",
+    "jest": "23.6.0",
+    "metro-react-native-babel-preset": "0.48.1",
+    "react-test-renderer": "16.6.0-alpha.8af6728"
+  },
 }
 
