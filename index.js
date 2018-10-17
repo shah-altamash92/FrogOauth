@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View,TouchableOpacity,Linking,BackHandler,TextInput} from 'react-native';
+import {Platform, StyleSheet, Text, View,TouchableOpacity,Linking,BackHandler,TextInput,Image} from 'react-native';
 import AuthWebView from './code/AuthWebView'
 import {oauth} from './code/auth';
 import {EndpointValidate} from './code/endpointValidate';
@@ -210,45 +210,75 @@ validateUrl() {
 }
   render() {
     return (
-      <View style={styles.container1}>
-      {this.state.loadWebView && !this.state.doHaveToken ?
-          <AuthWebView
-              schoolUrl={this.state.redirectUrl}
-              closeAuthWebView={this._closeAuthWebView.bind(this)}
-              oauth_token_secret={this.state.oauth_token_secret}
-              style={{ flex: 1 }}
-          /> :
-          <View style={globalStyles.container}>
-                        <View style={globalStyles.logoContainer}>
-                            {/* <Image source={require("../assets/images/frog-progress-logo.png")} style={globalStyles.logo} resizeMode='contain' />
-                            <Image source={require("../assets/images/frog-progress-text.png")} style={globalStyles.logoTextContainer} resizeMode='contain' /> */}
+        <View style={globalStyles.container}>
+        {this.state.loadWebView && !this.state.doHaveToken ?
+            <AuthWebView
+                schoolUrl={this.state.redirectUrl}
+                closeAuthWebView={this._closeAuthWebView.bind(this)}
+                oauth_token_secret={this.state.oauth_token_secret}
+                style={{ flex: 1 }}
+            /> :
+            <View style={globalStyles.container}>
+                <View style={globalStyles.logoContainer}>
+                    <Image source={require('./code/images/frog-progress-logo.png')} style={globalStyles.logo} resizeMode='contain' />
+                    <Image source={require("./code/images/frog-progress-text.png")} style={globalStyles.logoTextContainer} resizeMode='contain' />
+                </View>
+                {
+                     this.state.isBottomVisible ?
+                    <View style={globalStyles.footer}>
+                        <View style={globalStyles.bottomContainer}>
+                            <TextInput style={globalStyles.inputStyle} placeholder="Please enter school url here"
+                                value={this.state.schoolUrl}
+                                underlineColorAndroid='transparent' placeholderTextColor={'gray'}
+                                onChangeText={schoolUrl => this.setState({ schoolUrl })} />
+                            <TouchableOpacity style={globalStyles.blueBGStyle} onPress={() => this.validateUrl()}>
+                                <Text style={globalStyles.whiteTextStyle}>Next</Text>
+                            </TouchableOpacity>
                         </View>
-          {/* <TouchableOpacity style={styles.blueBGStyle} onPress={() => this.validateUrl()}>
-                 <Text>Next</Text>
-             </TouchableOpacity> */}
-               {
-                             this.state.isBottomVisible ?
-                            <View style={globalStyles.footer}>
-                                <View style={globalStyles.bottomContainer}>
-                                    <TextInput style={globalStyles.inputStyle} placeholder="Please enter school url here"
-                                        value={this.state.schoolUrl}
-                                        underlineColorAndroid='transparent' placeholderTextColor={'gray'}
-                                        onChangeText={schoolUrl => this.setState({ schoolUrl })} />
-                                    <TouchableOpacity style={globalStyles.blueBGStyle} onPress={() => this.validateUrl()}>
-                                        <Text style={globalStyles.whiteTextStyle}>Next</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View> : null
-                        }
-        
-     </View> 
-      }
+                    </View> : null
+                }
+            </View>
+        }
       
-  </View>
+    </View>
+//       <View style={styles.container1}>
+//       {this.state.loadWebView && !this.state.doHaveToken ?
+//           <AuthWebView
+//               schoolUrl={this.state.redirectUrl}
+//               closeAuthWebView={this._closeAuthWebView.bind(this)}
+//               oauth_token_secret={this.state.oauth_token_secret}
+//               style={{ flex: 1 }}
+//           /> :
+//           <View style={globalStyles.container}>
+//                         <View style={globalStyles.logoContainer}>
+//                             {/* <Image source={require("../assets/images/frog-progress-logo.png")} style={globalStyles.logo} resizeMode='contain' />
+//                             <Image source={require("../assets/images/frog-progress-text.png")} style={globalStyles.logoTextContainer} resizeMode='contain' /> */}
+//                         </View>
+//           {/* <TouchableOpacity style={styles.blueBGStyle} onPress={() => this.validateUrl()}>
+//                  <Text>Next</Text>
+//              </TouchableOpacity> */}
+//                {
+//                              this.state.isBottomVisible ?
+//                             <View style={globalStyles.footer}>
+//                                 <View style={globalStyles.bottomContainer}>
+//                                     <TextInput style={globalStyles.inputStyle} placeholder="Please enter school url here"
+//                                         value={this.state.schoolUrl}
+//                                         underlineColorAndroid='transparent' placeholderTextColor={'gray'}
+//                                         onChangeText={schoolUrl => this.setState({ schoolUrl })} />
+//                                     <TouchableOpacity style={globalStyles.blueBGStyle} onPress={() => this.validateUrl()}>
+//                                         <Text style={globalStyles.whiteTextStyle}>Next</Text>
+//                                     </TouchableOpacity>
+//                                 </View>
+//                             </View> : null
+//                         }
+        
+//      </View> 
+//       }
+      
+//   </View>
     );
-  }
 }
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
