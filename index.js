@@ -9,7 +9,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,TouchableOpacity,Linking,BackHandler,TextInput,Image} from 'react-native';
 import AuthWebView from './code/AuthWebView'
-import {oauth} from './code/auth';
+import {oauth,oauth1,oauth2} from './code/auth';
 import {EndpointValidate} from './code/endpointValidate';
 import globalStyles from './code/styles';
 
@@ -114,6 +114,14 @@ _handleOpenURL(url) {
     // this.setState({ callbackURl: authParams })
     console.log(authParams);
 
+    this.props.getOuthData(authParams);
+    console.log('secret :'+this.state.oauth_token_secret );
+    console.log('schoolUrl :'+this.state.schoolUrl );
+    
+    if (this.state.oauth_token_secret && this.state.oauth_token_secret.length > 0) {
+         this.callAccessApi('http://'+this.state.schoolUrl, this.state.oauth_token_secret, authParams)
+        }
+
     // SharedStorage.retrieveSchoolUrl().then((res) => {
     //     if (res && res.length > 0) {
     //         // console.log(res);
@@ -129,6 +137,76 @@ _handleOpenURL(url) {
     // });
     // do something with the url, in our case navigate(route)
     this._closeAuthWebView();
+}
+
+callAccessApi = (schoolUrl, secret, authParams) => {
+    _this = this;
+    const token = {
+        key: authParams.oauth_token,
+        secret: secret
+    };
+
+    // console.log ('Initial url is: ' + this.state.callbackURl)
+    // const callbackUrl = this.state.callbackURl
+    const request_data = {
+        url: schoolUrl + '/api/2/oauth1.php/access-token',
+        method: 'POST',
+        data: { oauth_token: authParams.oauth_token, oauth_verifier: authParams.oauth_verifier, oauth_secret: secret }
+    };
+
+    console.log('Secret:' + secret);
+    console.log('schoolUrl:' + schoolUrl);
+    params = oauth1.authorize(request_data, token);
+    // params.oauth_token = authParams.oauth_token;
+    // params.oauth_verifier = authParams.oauth_verifier;
+    console.log(params);
+
+    query = "OAuth oauth_consumer_key=\"" + params.oauth_consumer_key + "\", oauth_nonce=\"" + params.oauth_nonce + "\", oauth_signature=\"" + params.oauth_signature + "\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"" + params.oauth_timestamp + "\", oauth_token=\"" + params.oauth_token + "\", oauth_verifier=\"" + params.oauth_verifier + "\", oauth_version=\"1.0\"";
+
+    console.log("query while hitting access-api: " + query);
+    //query = query.replace(/"/g, '\\"');
+    header = {
+        // "Accept": "application/json",
+        "Accept-Encoding": "*",
+        // "Accept-Language" : "en;q=1",
+        Authorization: query,
+        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        "X-AuthType": "oauth_1_0_a",
+
+    };
+
+    console.log(header);
+
+    //var v = fetch(request_data.url+'?'+query, {
+
+    var v = fetch(request_data.url, {
+        method: 'POST',
+        headers: header
+
+    }).then((response) => {
+        console.log('API Response :'+JSON.stringify(response));
+
+        if (response.status !== 200) {
+            Toast.show('Looks like there was a problem. Status Code: '+ response.status+' / '+ response, Toast.LONG);
+            console.log('Looks like there was a problem. Status Code: ', response.status, response);
+            _this.hideLoading();
+            _this.showBottomLayout();
+            return;
+        }
+        else {
+            response.text().then(function (res) {
+                console.log('ACCESS TOKEN RESPONSE WITH OAUTH TOKEN')
+                console.log(res);
+                console.log('============');
+                // this.setState({ callbackURl: authParams })
+                console.log(authParams);
+                SharedStorage.storeFrogAuth(res);
+                //   SharedStorage.storeFrogSecret(authParams.oauth_token_secret);
+                _this.props.getUserInfo();
+                _this.hideLoading();
+            });
+        }
+    });
 }
 
 generateTokenSignature = (schoolUrl) => {
