@@ -1,29 +1,54 @@
 {
-  "name": "react-native-frog-oauth",
-  "version": "1.0.0",
-  "description": "React Native Frog oauth",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \\\"Error: no test specified\\\" && exit 1"
-  },
-  "repository": {
+  "_from": "git+https://github.com/shah-altamash92/FrogOauth.git",
+  "_id": "react-native-frog-oauth@1.0.0",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/react-native-frog-oauth",
+  "_phantomChildren": {},
+  "_requested": {
     "type": "git",
-    "url": "git+https://github.com/shah-altamash92/FrogOauth.git"
+    "raw": "react-native-frog-oauth@git+https://github.com/shah-altamash92/FrogOauth.git",
+    "name": "react-native-frog-oauth",
+    "escapedName": "react-native-frog-oauth",
+    "rawSpec": "git+https://github.com/shah-altamash92/FrogOauth.git",
+    "saveSpec": "git+https://github.com/shah-altamash92/FrogOauth.git",
+    "fetchSpec": "https://github.com/shah-altamash92/FrogOauth.git",
+    "gitCommittish": null
   },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://github.com/shah-altamash92/FrogOauth.git#780e0005a0c432527c0d7feea2bc95244294b58a",
+  "_spec": "react-native-frog-oauth@git+https://github.com/shah-altamash92/FrogOauth.git",
+  "_where": "/Users/dineshkumar/Desktop/Frog Progress React/FrogProgress_React",
+  "author": {
+    "name": "Frog"
+  },
+  "bugs": {
+    "url": "https://github.com/shah-altamash92/FrogOauth/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "oauth-1.0a": "^2.2.4",
+    "oauth-signature": "^1.5.0",
+    "react-native-indicators": "^0.13.0"
+  },
+  "deprecated": false,
+  "description": "React Native Frog oauth",
+  "homepage": "https://github.com/shah-altamash92/FrogOauth#readme",
   "keywords": [
     "Frog",
     "Loader"
   ],
-  "author": "Frog",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/shah-altamash92/FrogOauth/issues"
+  "main": "index.js",
+  "name": "react-native-frog-oauth",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shah-altamash92/FrogOauth.git"
   },
-  "homepage": "https://github.com/shah-altamash92/FrogOauth#readme",
-   "dependencies": {
-    "react-native-indicators": "^0.13.0",
-      "oauth-1.0a": "^2.2.4",
-    "oauth-signature": "^1.5.0"
-     
-  }
+  "scripts": {
+    "test": "echo \\\"Error: no test specified\\\" && exit 1"
+  },
+  "version": "1.0.0"
 }

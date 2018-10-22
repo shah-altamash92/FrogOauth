@@ -8,12 +8,20 @@ import {
   Image,
   Dimensions
 } from 'react-native';
-import units from './Viewport';
+//import units from './Viewport';
 
-//import CookieManager from 'react-native-cookies';
-// import Icon from 'react-native-vector-icons/FontAwesome';
+import CookieManager from 'react-native-cookies';
+import Loader from 'react-native-frog-loader';
 
-// import * as SharedStorage from '../../storage/SharedStorage';
+var {width, height} = Dimensions.get('window');
+
+var units = {
+  vw: Dimensions.get('window').width/100
+, vh: height/100
+};
+
+units.vmin = Math.min(units.vw, units.vh);
+units.vmax = Math.max(units.vw, units.vh);
 
 
 class AuthWebView extends Component {
@@ -26,11 +34,15 @@ class AuthWebView extends Component {
         super(props);
         // console.log(this.props.schoolUrl);
         this.onNavigationStateChange = this.onNavigationStateChange.bind(this);
-
-        //CookieManager.clearAll();
+        this.hideLoader = this.hideLoader.bind(this);
+        this.state = {'loading':true};
+        CookieManager.clearAll();
         //console.log(units.vw);
     }
-
+    hideLoader = () => {
+      console.log('loader');
+      this.setState({'loading' : false});
+    }
   
     onNavigationStateChange = (webViewState) => {
       const { url } = webViewState;
@@ -39,6 +51,7 @@ class AuthWebView extends Component {
       if(url.includes('http')) {
         this.setState({ webViewUrl: url })
       }
+
   
       const check = "//success"; //"app/os";
       console.log('index'+url.indexOf(check));
@@ -58,6 +71,7 @@ class AuthWebView extends Component {
       return (
         <View style={{flex: 1}}>
           <WebView
+             onLoad={this.hideLoader}
             source={{ uri: this.props.schoolUrl }}
             onNavigationStateChange={this.onNavigationStateChange}
             onMessage={this._onMessage}
@@ -70,6 +84,7 @@ class AuthWebView extends Component {
           <TouchableOpacity style={styles.closeButton} onPress={() => this.props.closeAuthWebView() }>
             <Image source={require('./images/ic_close_white.png')} resizeMode='contain' style={styles.closeButtonIcon} />
           </TouchableOpacity>
+          <Loader show={this.state.loading}></Loader>
         </View>
       );
     }
