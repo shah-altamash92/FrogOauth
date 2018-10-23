@@ -12,7 +12,7 @@ var oauthSignature = require('oauth-signature');
     signature_method: 'HMAC-SHA1',
     hash_function(base_string, key) {
 
-        initialSeparator = base_string.indexOf('&');
+       var initialSeparator = base_string.indexOf('&');
         var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
         var search = decodeURIComponent(base_string.substring(base_string.indexOf('&', 5)+1))
 
@@ -30,10 +30,10 @@ var oauthSignature = require('oauth-signature');
         if(tokenSecret){     
             delete parameters.oauth_secret
             basePath = encodeURIComponent (basePath);
-            encodedSignature = oauthSignature.generate('POST', basePath, parameters,CONSUMER_SECRET, tokenSecret, { encodeSignature: false})
+          var  encodedSignature = oauthSignature.generate('POST', basePath, parameters,CONSUMER_SECRET, tokenSecret, { encodeSignature: false})
         }
         else
-            encodedSignature = oauthSignature.generate('GET', basePath, parameters,CONSUMER_SECRET)
+          var  encodedSignature = oauthSignature.generate('GET', basePath, parameters,CONSUMER_SECRET)
         encodedSignature = decodeURIComponent(encodedSignature)
         // console.log(encodedSignature);
         return encodedSignature;
@@ -48,7 +48,7 @@ const oauth1 = OAuth({
     //    console.log(decodeURIComponent(base_string));
    
 
-       initialSeparator = base_string.indexOf('&');
+     var initialSeparator = base_string.indexOf('&');
        initialSeparator = base_string.indexOf('&');
        var methodType = base_string.substring(0, initialSeparator);
        var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
@@ -70,7 +70,7 @@ const oauth1 = OAuth({
   
        delete parameters.oauth_secret
        var encodedURI = encodeURIComponent (basePath);
-       encodedSignature = oauthSignature.generate(methodType, basePath, parameters,CONSUMER_SECRET, tokenSecret,
+      var encodedSignature = oauthSignature.generate(methodType, basePath, parameters,CONSUMER_SECRET, tokenSecret,
       { encodeSignature: false})
         encodedSignature = decodeURIComponent(encodedSignature)
        
@@ -88,7 +88,7 @@ const oauth2 = OAuth({
     signature_method: 'HMAC-SHA1',
      hash_function(base_string, key) {
 
-       initialSeparator = base_string.indexOf('&');
+       var initialSeparator = base_string.indexOf('&');
        var methodType = base_string.substring(0, initialSeparator);
        var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
 
@@ -104,7 +104,7 @@ const oauth2 = OAuth({
   
        delete parameters.oauth_secret
        var encodedURI = encodeURIComponent (basePath);
-       encodedSignature = oauthSignature.generate(methodType, basePath, parameters, consumerSecret, tokenSecret,
+      var encodedSignature = oauthSignature.generate(methodType, basePath, parameters, consumerSecret, tokenSecret,
        { encodeSignature: false})
         encodedSignature = decodeURIComponent(encodedSignature)
 
