@@ -14,11 +14,6 @@ import {oauth,oauth1,oauth2} from './code/auth';
 import * as SharedStorage from './code/SharedStorage';
 import { connect } from "react-redux";
 
-var _schoolUrl = '';
-var _authSecert = '';
-var _frogAuth = '';
-
-
 const token = {
   key: 'a16e6a6de547886d29c809521946423e56b70a2d',
   secret: '8de9fcd76fc0818a1485245a1c6b1b6fefe06f90'
@@ -350,23 +345,33 @@ validateUrl() {
       str = str.replace("https://", "");
       str = str.replace("http://", "");
 
-      this.checkUrlStatus('https://' + str).then((res) => {
+      fetch('https://' + str).then((res) => {
+          console.log(res);
           if (res.status == 404) {
-              console.log('Error!! Page not found');
-              this.props.errorMessage('login.invalidUrl');
+              console.log('Error!! Page not found '+'https://' + str);
+              this.props.errorMessage('invalidUrl');
           }
           else {
-                SharedStorage.storeSchoolUrl('https://' + str);
-              this.generateTokenSignature('https://' + str);
-               console.log('Its a valid url');
+            this.checkUrlStatus('https://' + str).then((res) => {
+                    if (res.status == 200) {
+                        SharedStorage.storeSchoolUrl('https://' + str);
+                        this.generateTokenSignature('https://' + str);
+                        console.log('Its a valid url');
+                    }
+                    else {
+                        this.props.errorMessage('noFrogUrl');
+                    }
+                }).catch(err =>{
+                this.props.errorMessage('invalidUrl');             
+            }) 
           }
       }).catch(err =>{
-        this.props.errorMessage('login.invalidUrl');             
+        this.props.errorMessage('invalidUrl');             
     }) 
       
   }
   else {
-    this.props.errorMessage('login.noUrl');  
+    this.props.errorMessage('noUrl');  
   }
 }
   render() {
