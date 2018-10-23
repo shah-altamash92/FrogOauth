@@ -13,7 +13,10 @@ import {oauth,oauth1,oauth2} from './code/auth';
 //import {EndpointValidate} from './code/endpointValidate';
 import * as SharedStorage from './code/SharedStorage';
 import { connect } from "react-redux";
-import {userActions} from './code/user';
+
+var _schoolUrl = '';
+var _authSecert = '';
+var _frogAuth = '';
 
 
 const token = {
@@ -194,7 +197,7 @@ _handleOpenURL(url) {
 }
 
 callAccessApi = (schoolUrl, secret, authParams) => {
-    _this = this;
+  var  _this = this;
     const token = {
         key: authParams.oauth_token,
         secret: secret
@@ -210,16 +213,16 @@ callAccessApi = (schoolUrl, secret, authParams) => {
 
     console.log('Secret:' + secret);
     console.log('schoolUrl:' + schoolUrl);
-    params = oauth1.authorize(request_data, token);
+   var params = oauth1.authorize(request_data, token);
     // params.oauth_token = authParams.oauth_token;
     // params.oauth_verifier = authParams.oauth_verifier;
     console.log(params);
 
-    query = "OAuth oauth_consumer_key=\"" + params.oauth_consumer_key + "\", oauth_nonce=\"" + params.oauth_nonce + "\", oauth_signature=\"" + params.oauth_signature + "\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"" + params.oauth_timestamp + "\", oauth_token=\"" + params.oauth_token + "\", oauth_verifier=\"" + params.oauth_verifier + "\", oauth_version=\"1.0\"";
+   var query = "OAuth oauth_consumer_key=\"" + params.oauth_consumer_key + "\", oauth_nonce=\"" + params.oauth_nonce + "\", oauth_signature=\"" + params.oauth_signature + "\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"" + params.oauth_timestamp + "\", oauth_token=\"" + params.oauth_token + "\", oauth_verifier=\"" + params.oauth_verifier + "\", oauth_version=\"1.0\"";
 
     console.log("query while hitting access-api: " + query);
     //query = query.replace(/"/g, '\\"');
-    header = {
+  var  header = {
         // "Accept": "application/json",
         "Accept-Encoding": "*",
         // "Accept-Language" : "en;q=1",
@@ -281,22 +284,23 @@ moveToHome() {
 }
 generateTokenSignature = (schoolUrl) => {
    console.log('schoolUrl'+schoolUrl);
-  _this = this;
+  let  _this = this;
   const request_data = {
       url: schoolUrl + '/api/2/oauth1.php/request-token',
       method: 'GET',
   };
-  //console.log('schoolUrl'+schoolUrl);
   
-
-  params = oauth.authorize(request_data);
+  
+  
+ let  params = oauth.authorize(request_data);
+ console.log('schoolUrl'+schoolUrl);
   params.oauth_callback = 'x-com-frogtrade-frogprogress-oauth://success'
   var query = Object.keys(params)
       .map(k => k + '=' + params[k])
       .join('&');
   //  console.log (params)
   //  console.log(query);
-
+  
   var oauthPath = request_data.url + '?' + query
 
   fetch(oauthPath).then(function (response) {
@@ -355,7 +359,6 @@ validateUrl() {
               this.hideLoading();
           }
           else {
-
                 SharedStorage.storeSchoolUrl('https://' + str);
               this.generateTokenSignature('https://' + str);
                console.log('Its a valid url');
