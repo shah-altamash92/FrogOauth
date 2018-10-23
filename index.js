@@ -343,10 +343,7 @@ generateTokenSignature = (schoolUrl) => {
     return fetch(url+VALIDATE_URL);
 }
 validateUrl() {
-  //this.generateTokenSignature(this.state.schoolUrl);
-  // // this.props.navigation.navigate('Home');
-  console.log('this.state.schoolUrl '+this.state.schoolUrl);
-
+  
   if (this.state.schoolUrl) {
     
       var str = this.state.schoolUrl
@@ -356,20 +353,20 @@ validateUrl() {
       this.checkUrlStatus('https://' + str).then((res) => {
           if (res.status == 404) {
               console.log('Error!! Page not found');
-              this.hideLoading();
+              this.props.errorMessage('login.invalidUrl');
           }
           else {
                 SharedStorage.storeSchoolUrl('https://' + str);
               this.generateTokenSignature('https://' + str);
                console.log('Its a valid url');
-              // this.setState({
-              //     loadWebView: true
-              // });
           }
-      })
+      }).catch(err =>{
+        this.props.errorMessage('login.invalidUrl');             
+    }) 
+      
   }
   else {
-      console.log('no school url');
+    this.props.errorMessage('login.noUrl');  
   }
 }
   render() {
