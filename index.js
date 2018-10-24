@@ -10,7 +10,6 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,TouchableOpacity,Linking,BackHandler,TextInput,Image} from 'react-native';
 import AuthWebView from './code/AuthWebView';
 import {oauth,oauth1,oauth2} from './code/auth';
-//import {EndpointValidate} from './code/endpointValidate';
 import * as SharedStorage from './code/SharedStorage';
 import { connect } from "react-redux";
 
@@ -30,21 +29,11 @@ export default class Oauth extends Component {
         loadWebView: false,
         loading: false,
         isBottomVisible: true,
-    }
-    console.log('this.props.authUrl'+this.props.authUrl);   
-    console.log('this.props.schoolUrl'+this.state.schoolUrl);       
+    }      
     this.generateTokenSignature = this.generateTokenSignature.bind(this);
-    ///this.callAccessApi = this.callAccessApi.bind(this);
-    // console.log(this.state.loadWebView);       
-    
-    // this.demoAuth();
-    
+   
 }
   _closeAuthWebView =() => {
-    // this.setState({
-    //     loadWebView: false,
-    // });
-    console.log('closeAuthWebView');
     this.props.closeAuthWebView();
 }
 showBottomLayout=()=>{
@@ -72,12 +61,7 @@ hideLoading=()=>{
 
 
  componentDidMount(){
-  // getRequestToken1('https://rsystemsprogressrel1.frogtest.co.uk');
-    // getCurrentTime1('https://rsystemsprogressrel1.frogtest.co.uk').then(currentTime => {
-    //   console.log('The current time is12334: ' + currentTime);
-    //   return true;
-    // })
-    // .catch(err => console.log('There was an error:' + err))
+  
     this.validateUrl();
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
         Linking.addEventListener('url', this.handleURL.bind(this));
@@ -86,17 +70,6 @@ hideLoading=()=>{
         console.log(url);
         if (url) {
             console.log('Initial url is: ' + url);
-
-            // SharedStorage.retrieveFrogAuth().then((res) => {
-            //     if(!res){
-            //         this.showLoading();
-            //         // Toast.show('Authenticating user', Toast.SHORT);
-            //         this._handleOpenURL(url);
-            //     }
-            //     // else{
-            //     //     this.checkIfUserAlreadyLogin();
-            //     // }
-            // })
         }
         else{
             this.checkIfUserAlreadyLogin();
@@ -104,23 +77,17 @@ hideLoading=()=>{
     }).catch(err => console.log('An error occurred', err));
 }
 checkIfUserAlreadyLogin = () => {
-    // this.setState({
-    //     redirectUrl: 'https://www.google.com',
-    //     loadWebView: true,
-    // });
+   
     this.showLoading();
     this.hideBottomLayout();
 
     SharedStorage.retrieveSchoolUrl().then((res) => {
-        // console.log(res);
+       
         if (res && res.length > 0) {
-            // console.log(res);
             SharedStorage.retrieveFrogAuth().then((oauth_model) => {
-                // console.log(oauth_model);
                 if (oauth_model && oauth_model.oauth_token && oauth_model.oauth_token_secret) {
                     // console.log(token);
                     this.props.getUserInfo();
-                    // this.props.navigation.navigate('Home');
                 }
                 else {
                     this.showBottomLayout();
@@ -139,9 +106,6 @@ componentWillReceiveProps(props) {
  
 }
 handleURL(event) {
-    console.log('****mount called');
-    console.log(event.url);
-
     if (event.url) {
         console.log('Initial url is: ' + event.url);
        // this._handleOpenURL(event.url);
@@ -169,11 +133,6 @@ _handleOpenURL(url) {
 
     console.log('secret :'+this.state.oauth_token_secret );
     console.log('schoolUrl :'+this.state.schoolUrl );
-    
-    // if (this.state.oauth_token_secret && this.state.oauth_token_secret.length > 0) {
-    //      this.callAccessApi('http://'+this.state.schoolUrl, this.state.oauth_token_secret, authParams)
-    //     }
-
     SharedStorage.retrieveSchoolUrl().then((res) => {
         if (res && res.length > 0) {
             // console.log(res);
@@ -183,9 +142,6 @@ _handleOpenURL(url) {
                 }
             });
         }
-        // else{
-        //     this.showBottomLayout
-        // }
     });
     // do something with the url, in our case navigate(route)
     this._closeAuthWebView();
@@ -197,9 +153,6 @@ callAccessApi = (schoolUrl, secret, authParams) => {
         key: authParams.oauth_token,
         secret: secret
     };
-
-    // console.log ('Initial url is: ' + this.state.callbackURl)
-    // const callbackUrl = this.state.callbackURl
     const request_data = {
         url: schoolUrl + '/api/2/oauth1.php/access-token',
         method: 'POST',
@@ -302,9 +255,6 @@ generateTokenSignature = (schoolUrl) => {
   
       if (response.status !== 200) {
           console.log('Looks like there was a problem. Status Code: ', response.status, response);
-        //   _this.setState({
-        //       requestToken: null
-        //   })
           _this.props.closeAuthWebView();
           return;
       }
