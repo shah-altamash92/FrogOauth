@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Dimensions
+  Dimensions,
+  Platform
 } from 'react-native';
 //import units from './Viewport';
 
@@ -34,15 +35,15 @@ class AuthWebView extends Component {
         super(props);
         // console.log(this.props.schoolUrl);
         this.onNavigationStateChange = this.onNavigationStateChange.bind(this);
-        this.hideLoader = this.hideLoader.bind(this);
-        this.state = {'loading':true};
+        // this.hideLoader = this.hideLoader.bind(this);
+        // this.state = {'loading':true};
         CookieManager.clearAll();
         //console.log(units.vw);
     }
-    hideLoader = () => {
-      console.log('loader');
-      this.setState({'loading' : false});
-    }
+    // hideLoader = () => {
+    //   console.log('loader');
+    //   this.setState({'loading' : false});
+    // }
   
     onNavigationStateChange = (webViewState) => {
       const { url } = webViewState;
@@ -54,8 +55,11 @@ class AuthWebView extends Component {
 
   
       const check = "//success"; //"app/os";
-      console.log('index'+url.indexOf(check));
+      // console.log('index'+url.indexOf(check));
       if(url.indexOf(check) > 0){
+        if(Platform.OS === "android"){
+          this.props.onAuthSuccess(url);
+        }
         // this.props.navigation.pop();
         // CookieManager.get(url).then((res) => {
         //   // console.log('CookieManager.get =>', res.frogos_auth);
@@ -71,7 +75,7 @@ class AuthWebView extends Component {
       return (
         <View style={{flex: 1}}>
           <WebView
-             onLoad={this.hideLoader}
+            //  onLoad={this.hideLoader}
             source={{ uri: this.props.schoolUrl }}
             onNavigationStateChange={this.onNavigationStateChange}
             onMessage={this._onMessage}
@@ -96,8 +100,8 @@ class AuthWebView extends Component {
     closeButton: {
       backgroundColor: '#D31246',
       // padding:10,
-      width: 15*units.vw,
-      height:15*units.vw,
+      width: 50,
+      height:50,
       position: 'absolute',
       right:0,
       top:0,
@@ -106,7 +110,7 @@ class AuthWebView extends Component {
       alignItems: 'center'
     },
     closeButtonIcon: {
-      width: 8*units.vw,
-      height:8*units.vw,
+      width: 28,
+      height:28,
     }
   });
