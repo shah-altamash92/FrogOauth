@@ -6,49 +6,56 @@ var oauthSignature = require('oauth-signature');
  
 
  const oauth = OAuth({
+  
+  consumer: { key: CONSUMER_KEY, secret: CONSUMER_SECRET}, // React native Progress keys
+  
+  signature_method: 'HMAC-SHA1',
+  hash_function(base_string, key) {
 
-    consumer: { key: CONSUMER_KEY, secret:CONSUMER_SECRET}, // React native Progress keys
-    
-    signature_method: 'HMAC-SHA1',
-    hash_function(base_string, key) {
+      var initialSeparator = base_string.indexOf('&');
+      var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
+      var search = decodeURIComponent(base_string.substring(base_string.indexOf('&', 5)+1))
 
-       var initialSeparator = base_string.indexOf('&');
-        var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
-        var search = decodeURIComponent(base_string.substring(base_string.indexOf('&', 5)+1))
+      // console.log(basePath);
+      // console.log(search);
 
-        // console.log(basePath);
-        // console.log(search);
+      var parameters = JSON.parse('{"' + (search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+      var tokenSecret = parameters.oauth_secret;
+      // console.log(tokenSecret);
 
-        var parameters = JSON.parse('{"' + (search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
-        var tokenSecret = parameters.oauth_secret;
-        // console.log(tokenSecret);
+      if(basePath.indexOf('request-token') > 0)
+          parameters.oauth_callback = 'x-com-frogtrade-frogprogress-oauth://success'
+      // console.log(parameters);
 
-        if(basePath.indexOf('request-token') > 0)
-            parameters.oauth_callback = 'x-com-frogtrade-frogprogress-oauth://success'
-        // console.log(parameters);
+      var encodedSignature;
+      if(tokenSecret){     
+        
+          delete parameters.oauth_secret
+          basePath = encodeURIComponent (basePath);
+          encodedSignature = oauthSignature.generate('POST', basePath, parameters, CONSUMER_SECRET, tokenSecret, { encodeSignature: false})
+      }
+      else
+          encodedSignature = oauthSignature.generate('GET', basePath, parameters, CONSUMER_SECRET)
 
-        if(tokenSecret){     
-            delete parameters.oauth_secret
-            basePath = encodeURIComponent (basePath);
-          var  encodedSignature = oauthSignature.generate('POST', basePath, parameters,CONSUMER_SECRET, tokenSecret, { encodeSignature: false})
-        }
-        else
-          var  encodedSignature = oauthSignature.generate('GET', basePath, parameters,CONSUMER_SECRET)
-        encodedSignature = decodeURIComponent(encodedSignature)
-        // console.log(encodedSignature);
-        return encodedSignature;
-    }
-});
+          //console.log("un-Encoded Signature in get Request token:" + encodedSignature); 
+          //encodedSignature = decodeURIComponent(encodedSignature)
+          //console.log("encodedSignature:" + encodedSignature);
+         
+
+      return encodedSignature;
+  }
+})
+
 const oauth1 = OAuth({
   
-    consumer: { key:CONSUMER_KEY, secret:CONSUMER_SECRET}, // React native Progress keys
+    consumer: { key:  CONSUMER_KEY, secret: CONSUMER_SECRET}, // React native Progress keys
      
     signature_method: 'HMAC-SHA1',
      hash_function(base_string, key) {
     //    console.log(decodeURIComponent(base_string));
    
 
-     var initialSeparator = base_string.indexOf('&');
+       var initialSeparator = base_string.indexOf('&');
        initialSeparator = base_string.indexOf('&');
        var methodType = base_string.substring(0, initialSeparator);
        var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
@@ -62,6 +69,7 @@ const oauth1 = OAuth({
     //    console.log(search);
   
        var parameters = JSON.parse('{"' + (search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+    //    console.log(parameters);
 
        if(parameters.sections)
         parameters.sections = decodeURIComponent(parameters.sections);
@@ -69,48 +77,62 @@ const oauth1 = OAuth({
        var tokenSecret = parameters.oauth_secret;
   
        delete parameters.oauth_secret
+    //    console.log(parameters);
        var encodedURI = encodeURIComponent (basePath);
-      var encodedSignature = oauthSignature.generate(methodType, basePath, parameters,CONSUMER_SECRET, tokenSecret,
-      { encodeSignature: false})
-        encodedSignature = decodeURIComponent(encodedSignature)
-       
-       return encodedSignature;
-     }
-   });
+      
+    //    console.log("basePath while generating signature: " + basePath);
+    //    console.log("encodedURI while generating signature: " + encodedURI);
+    //    console.log(parameters);
+    //    console.log("consumerSecret while generating signature: " + CONSUMER_SECRET);
+    //    console.log("tokenSecret while generating signature: " + tokenSecret);
    
+       // generates a RFC 3986 encoded, BASE64 encoded HMAC-SHA1 hash
+       //encodedSignature = oauthSignature.generate('GET', basePath, parameters, consumerSecret, tokenSecret);
+       var encodedSignature = oauthSignature.generate(methodType, basePath, parameters, CONSUMER_SECRET, tokenSecret,{ encodeSignature: false})
   
-   
-
-const oauth2 = OAuth({
-  
-    consumer: { key: 'qj9dvvss3bogrryquze5c52alzxyjlnf', secret: 'j4uff38y4qg88j0edxyf7dep4dn095whsia9ms5e'}, // React native Progress keys
-     
-    signature_method: 'HMAC-SHA1',
-     hash_function(base_string, key) {
-
-       var initialSeparator = base_string.indexOf('&');
-       var methodType = base_string.substring(0, initialSeparator);
-       var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
-
-       consumerKey = 'qj9dvvss3bogrryquze5c52alzxyjlnf'
-       consumerSecret = 'j4uff38y4qg88j0edxyf7dep4dn095whsia9ms5e'
-   
-       var search = decodeURIComponent(base_string.substring(base_string.indexOf('&', 5)+1))
-
-       var parameters = JSON.parse('{"' + (search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
-       var tokenSecret = parameters.oauth_secret;
+       //console.log("encodedSignature oauth1: " + encodedSignature);
+       if(basePath.indexOf('access-token')>-1)
+            encodedSignature = encodeURIComponent(encodedSignature)
+        //console.log("decodedSignature : " + encodedSignature);
         
-       parameters.sections = decodeURIComponent(parameters.sections);
-  
-       delete parameters.oauth_secret
-       var encodedURI = encodeURIComponent (basePath);
-      var encodedSignature = oauthSignature.generate(methodType, basePath, parameters, consumerSecret, tokenSecret,
-       { encodeSignature: false})
-        encodedSignature = decodeURIComponent(encodedSignature)
-
        return encodedSignature;
      }
    });
+   
+   
+  
+   
+
+// const oauth2 = OAuth({
+  
+//     consumer: { key: 'qj9dvvss3bogrryquze5c52alzxyjlnf', secret: 'j4uff38y4qg88j0edxyf7dep4dn095whsia9ms5e'}, // React native Progress keys
+     
+//     signature_method: 'HMAC-SHA1',
+//      hash_function(base_string, key) {
+
+//        var initialSeparator = base_string.indexOf('&');
+//        var methodType = base_string.substring(0, initialSeparator);
+//        var basePath = decodeURIComponent( base_string.substring(initialSeparator+1, base_string.indexOf('&', 5)))
+
+//        consumerKey = 'qj9dvvss3bogrryquze5c52alzxyjlnf'
+//        consumerSecret = 'j4uff38y4qg88j0edxyf7dep4dn095whsia9ms5e'
+   
+//        var search = decodeURIComponent(base_string.substring(base_string.indexOf('&', 5)+1))
+
+//        var parameters = JSON.parse('{"' + (search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
+//        var tokenSecret = parameters.oauth_secret;
+        
+//        parameters.sections = decodeURIComponent(parameters.sections);
+  
+//        delete parameters.oauth_secret
+//        var encodedURI = encodeURIComponent (basePath);
+//       var encodedSignature = oauthSignature.generate(methodType, basePath, parameters, consumerSecret, tokenSecret,
+//        { encodeSignature: false})
+//         encodedSignature = decodeURIComponent(encodedSignature)
+
+//        return encodedSignature;
+//      }
+//    });
    
 // const getRequestToken = (schoolUrl) => {
 //     console.log('schoolUrl'+schoolUrl);
@@ -167,4 +189,4 @@ const oauth2 = OAuth({
 //  }
 
 
-export {oauth,oauth1,oauth2};
+export {oauth,oauth1};
