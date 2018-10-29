@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
 
 import React, { Component } from 'react';
 import { Platform, StyleSheet,View, Linking } from 'react-native';
@@ -14,7 +7,7 @@ import { oauth, oauth1 } from './code/auth';
 
 var _schoolUrl = '';
 
-export default class OAuth extends Component {
+export default class Oauth extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -31,17 +24,12 @@ export default class OAuth extends Component {
 
     componentDidMount() {
 
-            // this.validateUrl();
-
         Linking.addEventListener('url', this.handleURL.bind(this));
 
         Linking.getInitialURL().then((url) => {
             console.log(url);
             if (url) {
                 console.log('Initial url is: ' + url);
-            }
-            else {
-                //this.checkIfUserAlreadyLogin();
             }
         }).catch(err => console.log('An error occurred', err));
     }
@@ -88,12 +76,8 @@ export default class OAuth extends Component {
         var params = oauth1({CONSUMER_SECRET:this.props.CONSUMER_SECRET,CONSUMER_KEY:this.props.CONSUMER_KEY}).authorize(request_data, token);
         var query = "OAuth oauth_consumer_key=\"" + params.oauth_consumer_key + "\", oauth_nonce=\"" + params.oauth_nonce + "\", oauth_signature=\"" + params.oauth_signature + "\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"" + params.oauth_timestamp + "\", oauth_token=\"" + params.oauth_token + "\", oauth_verifier=\"" + params.oauth_verifier + "\", oauth_version=\"1.0\"";
 
-        //console.log("query while hitting access-api: " + query);
-        //query = query.replace(/"/g, '\\"');
         var header = {
-            // "Accept": "application/json",
             "Accept-Encoding": "*",
-            // "Accept-Language" : "en;q=1",
             Authorization: query,
             "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
             "X-AuthType": "oauth_1_0_a",
@@ -110,15 +94,12 @@ export default class OAuth extends Component {
             
             _this.props.showHideLoader(false);
             if (response.status !== 200) {
-                // Toast.show('Looks like there was a problem. Status Code: '+ response.status+' / '+ response, Toast.LONG);
                 console.log('Looks like there was a problem. Status Code: ', response.status, response);
                 return;
             }
             else {
 
                 response.text().then(function (res) {
-                    // this.props.getOauthData(res);
-                    console.log('API status -- 200 :' + res);
                     _this.props.finalValidSchoolUrl(_schoolUrl);
                     _this.props.getOauthData(res);
                 });
@@ -137,7 +118,6 @@ export default class OAuth extends Component {
 
 
         let params = oauth({CONSUMER_SECRET:this.props.CONSUMER_SECRET,CONSUMER_KEY:this.props.CONSUMER_KEY}).authorize(request_data);
-        console.log('schoolUrl' + schoolUrl);
         params.oauth_callback = 'x-com-frogtrade-frogprogress-oauth://success'
         var query = Object.keys(params)
             .map(k => k + '=' + params[k])
@@ -157,17 +137,14 @@ export default class OAuth extends Component {
                 response.text().then(function (text) {
 
                     var route = decodeURIComponent(text.substring(text.indexOf('?') + 1))
-                    // console.log('handleOpenURL url is: ' + route);
                     var authParams = JSON.parse('{"' + (route).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
                     console.log('token:--> ' + authParams['oauth_token_secret'])
 
                     _this.setState({
                         redirectUrl: schoolUrl + '/app/oauthconsent' + '?' + text,
                         loadWebView: true,
-                        // requestToken: text,
                         oauth_token_secret: authParams['oauth_token_secret']
                     });
-                   // SharedStorage.storeOAuthSecret(authParams['oauth_token_secret'])
                 });
             }
 
@@ -197,21 +174,11 @@ export default class OAuth extends Component {
             this.setState({
                 redirectUrl: '',
                 loadWebView: false,
-                // requestToken: text,
+             
                 oauth_token_secret: ''
             });
-
-            fetch('https://' + str).then((res) => {
-                console.log(res);
-                if (res.status == 404) {
-                    this.props.showHideLoader(false);
-                    console.log('Error!! Page not found ' + 'https://' + str);
-                    this.props.errorMessage('invalidUrl');
-                }
-                else {
                     this.checkUrlStatus('https://' + str).then((res) => {
                         if (res.status == 200) {
-                            //SharedStorage.storeSchoolUrl('https://' + str);
                             _schoolUrl =  'https://' + str
                             this.generateTokenSignature('https://' + str);
                             console.log('Its a valid url');
@@ -226,27 +193,18 @@ export default class OAuth extends Component {
                         this.props.errorMessage('invalidUrl');
                     })
                 }
-            }).catch(err => {
-                this.props.showHideLoader(false);
-                console.log('Error!! fetch ='+err);
-                this.props.errorMessage('invalidUrl');
-            })
-
-        }
+      
         else {
-            // console.log('noUrl');
             this.props.errorMessage('noUrl');
         }
     }
 
     _onAuthSuccess = (url) => {
-        this.showLoading();
+        this.props.showHideLoader(true);
         this.setState({
             loadWebView: false,
             redirectUrl: ""
         });
-        // console.log(url);
-        //this._handleOpenURL(url);
     }
 
     render() {
@@ -271,12 +229,8 @@ export default class OAuth extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        // height: 100,
         flex: 1,
-        // justifyContent: 'center',
-        // alignItems: 'center',
         backgroundColor: 'transparent',
-        // backgroundColor: 'red',
         position: 'absolute', 
         top: 0, 
         left: 0, 
