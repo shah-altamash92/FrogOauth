@@ -7,28 +7,19 @@
  */
 
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TouchableOpacity, Linking, TextInput, Image } from 'react-native';
+import { Platform, StyleSheet,View, Linking } from 'react-native';
 import AuthWebView from './code/AuthWebView';
 import { oauth, oauth1 } from './code/auth';
-import * as SharedStorage from './code/SharedStorage';
-import { connect } from "react-redux";
 
-const token = {
-    key: 'a16e6a6de547886d29c809521946423e56b70a2d',
-    secret: '8de9fcd76fc0818a1485245a1c6b1b6fefe06f90'
-};
 
+var _schoolUrl = '';
 
 export default class Oauth extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            // schoolUrl: this.props.authUrl,
             redirectUrl: '',
-            doHaveToken: false,
             loadWebView: false,
-            loading: false,
-            isBottomVisible: true,
         }
         this.generateTokenSignature = this.generateTokenSignature.bind(this);
         this._onAuthSuccess = this._onAuthSuccess.bind(this);
@@ -37,29 +28,6 @@ export default class Oauth extends Component {
     _closeAuthWebView = () => {
         this.props.closeAuthWebView();
     }
-    showBottomLayout = () => {
-        this.setState({
-            isBottomVisible: true
-        })
-    }
-
-    hideBottomLayout = () => {
-        this.setState({
-            isBottomVisible: false
-        })
-    }
-    showLoading = () => {
-        this.setState({
-            loading: true
-        })
-    }
-
-    hideLoading = () => {
-        this.setState({
-            loading: false
-        })
-    }
-
 
     componentDidMount() {
 
@@ -73,7 +41,7 @@ export default class Oauth extends Component {
                 console.log('Initial url is: ' + url);
             }
             else {
-                this.checkIfUserAlreadyLogin();
+                //this.checkIfUserAlreadyLogin();
             }
         }).catch(err => console.log('An error occurred', err));
     }
@@ -84,72 +52,20 @@ export default class Oauth extends Component {
         }
     }
 
-
-    checkIfUserAlreadyLogin = () => {
-
-        this.showLoading();
-        this.hideBottomLayout();
-
-        SharedStorage.retrieveSchoolUrl().then((res) => {
-
-            if (res && res.length > 0) {
-                SharedStorage.retrieveFrogAuth().then((oauth_model) => {
-                    if (oauth_model && oauth_model.oauth_token && oauth_model.oauth_token_secret) {
-                        // console.log(token);
-                        this.props.getUserInfo();
-                    }
-                    else {
-                        this.showBottomLayout();
-                        this.hideLoading();
-                    }
-                });
-            }
-            else {
-                this.showBottomLayout();
-                this.hideLoading();
-            }
-        });
-    }
-
     handleURL(event) {
         if (event.url) {
-            console.log('Initial url is: ' + event.url);
-            // this._handleOpenURL(event.url);
-            SharedStorage.retrieveFrogAuth().then((res) => {
-                if (!res) {
-                    // Toast.show('Authenticating user', Toast.SHORT);
-                    this._handleOpenURL(event.url);
-                }
-                else {
-                    this.checkIfUserAlreadyLogin();
-                }
-            })
-        }
-        else {
-            this.checkIfUserAlreadyLogin();
+             this._handleOpenURL(event.url);
+     
         }
     }
     _handleOpenURL(url) {
-        console.log(url);
         var urlParams = decodeURIComponent(url.substring(url.indexOf('?') + 1))
-        console.log('handleOpenURL url is: ' + urlParams);
         var authParams = JSON.parse('{"' + (urlParams).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
-        // this.setState({ callbackURl: authParams })
-        console.log(authParams);
-
-        console.log('secret :' + this.state.oauth_token_secret);
-        console.log('schoolUrl :' + this.props.schoolUrl);
-        SharedStorage.retrieveSchoolUrl().then((res) => {
-            if (res && res.length > 0) {
-                // console.log(res);
-                SharedStorage.retrieveOAuthSecret().then((secret) => {
-                    if (secret && secret.length > 0) {
-                        this.callAccessApi(res, secret, authParams)
-                    }
-                });
-            }
-        });
-        // do something with the url, in our case navigate(route)
+       
+        if(_schoolUrl.length > 0 && this.state.oauth_token_secret){
+            this.callAccessApi(_schoolUrl, this.state.oauth_token_secret, authParams);
+        }
+       
         this._closeAuthWebView();
     }
 
@@ -164,19 +80,15 @@ export default class Oauth extends Component {
         const request_data = {
             url: schoolUrl + '/api/2/oauth1.php/access-token',
             method: 'POST',
-            data: { oauth_token: authParams.oauth_token, oauth_verifier: authParams.oauth_verifier, oauth_secret: secret }
+            data: { oauth_token: authParams.oauth_token, oauth_verifier: authParams.oauth_verifier, oauth_secret: secret,CONSUMER_SECRET:this.props.CONSUMER_SECRET }
         };
 
         console.log('Secret:' + secret);
         console.log('schoolUrl:' + schoolUrl);
-        var params = oauth1.authorize(request_data, token);
-        // params.oauth_token = authParams.oauth_token;
-        // params.oauth_verifier = authParams.oauth_verifier;
-        console.log(params);
-
+        var params = oauth1({CONSUMER_SECRET:this.props.CONSUMER_SECRET,CONSUMER_KEY:this.props.CONSUMER_KEY}).authorize(request_data, token);
         var query = "OAuth oauth_consumer_key=\"" + params.oauth_consumer_key + "\", oauth_nonce=\"" + params.oauth_nonce + "\", oauth_signature=\"" + params.oauth_signature + "\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"" + params.oauth_timestamp + "\", oauth_token=\"" + params.oauth_token + "\", oauth_verifier=\"" + params.oauth_verifier + "\", oauth_version=\"1.0\"";
 
-        console.log("query while hitting access-api: " + query);
+        //console.log("query while hitting access-api: " + query);
         //query = query.replace(/"/g, '\\"');
         var header = {
             // "Accept": "application/json",
@@ -190,23 +102,16 @@ export default class Oauth extends Component {
 
         console.log(header);
 
-        //var v = fetch(request_data.url+'?'+query, {
-
         var v = fetch(request_data.url, {
             method: 'POST',
             headers: header
 
         }).then((response) => {
-            console.log('API Response :' + JSON.stringify(response));
-            console.log('API status :' + response.status);
-
-
+            
             _this.props.showHideLoader(false);
             if (response.status !== 200) {
                 // Toast.show('Looks like there was a problem. Status Code: '+ response.status+' / '+ response, Toast.LONG);
                 console.log('Looks like there was a problem. Status Code: ', response.status, response);
-                // _this.hideLoading();
-                // _this.showBottomLayout();
                 return;
             }
             else {
@@ -214,49 +119,30 @@ export default class Oauth extends Component {
                 response.text().then(function (res) {
                     // this.props.getOauthData(res);
                     console.log('API status -- 200 :' + res);
+                    _this.props.finalValidSchoolUrl(_schoolUrl);
                     _this.props.getOauthData(res);
-                    console.log('ACCESS TOKEN RESPONSE WITH OAUTH TOKEN')
-                    console.log(res);
-                    console.log('============');
-                    // this.setState({ callbackURl: authParams })
-                    console.log(authParams);
-                    //SharedStorage.storeFrogAuth(res);
-                    //   SharedStorage.storeFrogSecret(authParams.oauth_token_secret);
-                    // _this.props.getUserInfo();
-                    // _this.hideLoading();
                 });
             }
         });
     }
 
-    moveToHome() {
-        // console.log('moving to home');
-        // this.props.navigation.navigate('Home');
-        this.hideLoading();
-        this.props.navigation.dispatch({
-            type: 'ReplaceCurrentScreen',
-            routeName: 'Home',
-            key: 'MoveToHome'
-        });
-    }
+  
     generateTokenSignature = (schoolUrl) => {
-        console.log('schoolUrl' + schoolUrl);
         let _this = this;
         const request_data = {
             url: schoolUrl + '/api/2/oauth1.php/request-token',
             method: 'GET',
+            data:{CONSUMER_SECRET:this.props.CONSUMER_SECRET}
         };
 
 
-        let params = oauth.authorize(request_data);
+        let params = oauth({CONSUMER_SECRET:this.props.CONSUMER_SECRET,CONSUMER_KEY:this.props.CONSUMER_KEY}).authorize(request_data);
         console.log('schoolUrl' + schoolUrl);
         params.oauth_callback = 'x-com-frogtrade-frogprogress-oauth://success'
         var query = Object.keys(params)
             .map(k => k + '=' + params[k])
             .join('&');
-        //  console.log (params)
-        //  console.log(query);
-
+       
         var oauthPath = request_data.url + '?' + query
 
         fetch(oauthPath).then(function (response) {
@@ -281,7 +167,7 @@ export default class Oauth extends Component {
                         // requestToken: text,
                         oauth_token_secret: authParams['oauth_token_secret']
                     });
-                    SharedStorage.storeOAuthSecret(authParams['oauth_token_secret'])
+                   // SharedStorage.storeOAuthSecret(authParams['oauth_token_secret'])
                 });
             }
 
@@ -325,7 +211,8 @@ export default class Oauth extends Component {
                 else {
                     this.checkUrlStatus('https://' + str).then((res) => {
                         if (res.status == 200) {
-                            SharedStorage.storeSchoolUrl('https://' + str);
+                            //SharedStorage.storeSchoolUrl('https://' + str);
+                            _schoolUrl =  'https://' + str
                             this.generateTokenSignature('https://' + str);
                             console.log('Its a valid url');
                         }
@@ -359,7 +246,7 @@ export default class Oauth extends Component {
             redirectUrl: ""
         });
         // console.log(url);
-        this._handleOpenURL(url);
+        //this._handleOpenURL(url);
     }
 
     render() {
@@ -420,8 +307,4 @@ const styles = StyleSheet.create({
         color: '#333333',
         marginBottom: 5,
     },
-    // container: {
-    //     flex: 1,
-    //     backgroundColor: 'transparent'
-    // }
 });
