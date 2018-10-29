@@ -14,7 +14,7 @@ import { oauth, oauth1 } from './code/auth';
 
 var _schoolUrl = '';
 
-export default class Oauth extends Component {
+export default class OAuth extends Component {
     constructor(props) {
         super(props)
         this.state = {
